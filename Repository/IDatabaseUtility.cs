@@ -10,7 +10,7 @@ namespace POSGresApi.Repository
 
         public async static Task<NpgsqlConnection> OpenConnection(string connectionString)
         {
-            if (Connection != null && (Connection.State == ConnectionState.Open || Connection.State == ConnectionState.Connecting))
+            if (isConnectionOpen(Connection))
             {
                 return Connection;
             }
@@ -20,12 +20,17 @@ namespace POSGresApi.Repository
             return Connection;
         }
 
-        public  Boolean ExecuteQuery(NpgsqlCommand command, NpgsqlConnection? connection = null);
+        public Task<bool> ExecuteQuery(NpgsqlCommand command, NpgsqlConnection? connection = null);
 
-        public DataTable GetAll(NpgsqlCommand command, NpgsqlConnection? connection = null);
+        public Task<DataTable> GetAll(NpgsqlCommand command, NpgsqlConnection? connection = null);
 
-        public DataTable GetAllById(NpgsqlCommand command, NpgsqlConnection? connection = null);
+        public Task<DataTable> GetAllById(NpgsqlCommand command, NpgsqlConnection? connection = null);
 
+
+        public static Boolean isConnectionOpen(NpgsqlConnection Connection)
+        {
+            return (Connection != null && (Connection.State == ConnectionState.Open || Connection.State == ConnectionState.Connecting));                
+        }
 
     }
 }
