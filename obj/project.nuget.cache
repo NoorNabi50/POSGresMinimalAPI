@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "YsueMP69q0FRkFqLv5+hAzj+2qnHRDQpFpbGKEwUA8qtVPW0T8cBjM4NYDVttT2duWG0xb8EabbFEwqKe6h6qw==",
+  "success": true,
+  "projectFilePath": "E:\\POSGresApi\\POSGresApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ncw\\.nuget\\packages\\npgsql\\6.0.7\\npgsql.6.0.7.nupkg.sha512",
+    "C:\\Users\\ncw\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
