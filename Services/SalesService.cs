@@ -25,9 +25,8 @@ namespace POSGresApi.Services
             foreach(var sale in sales)
             {
                 int saleId = sale.saleId;
-                List<SalesDetailDto> Detail = salesDetail.Where(x => x.saleId == saleId).ToList();
-                sale.salesDetailDto = Detail;
-                salesData.Add(saleId, sale);
+                sale.salesDetailDto = salesDetail.Where(x => x.saleId == saleId).ToList();
+                salesData[saleId] =  sale;
             }
 
             return salesData;
