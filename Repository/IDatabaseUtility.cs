@@ -22,7 +22,7 @@ namespace POSGresApi.Repository
 
         public Task<bool> ExecuteQuery(NpgsqlCommand command, NpgsqlConnection? connection = null);
 
-        public Task<DataTable> GetAll(NpgsqlCommand command, NpgsqlConnection? connection = null);
+        public Task<DataTable> GetData(NpgsqlCommand command, NpgsqlConnection? connection = null);
 
         public Task<DataTable> GetAllById(NpgsqlCommand command, NpgsqlConnection? connection = null);
 
