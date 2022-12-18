@@ -17,7 +17,7 @@ namespace POSGresApi.Services
         {
             var sales =  await GetAllSalesMaster();
 
-            if (sales == null && sales.Count == 0)
+            if (sales is null)
                 return null;
 
             var salesDetail = await GetAllSalesDetail();
