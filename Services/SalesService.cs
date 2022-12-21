@@ -15,6 +15,8 @@ namespace POSGresApi.Services
 
         public async Task<Dictionary<int,SalesDto>> GetAllSales()
         {
+           try 
+           {
             var sales =  await GetAllSalesMaster();
 
             if (sales is null)
@@ -28,20 +30,25 @@ namespace POSGresApi.Services
                 sale.salesDetailDto = salesDetail.Where(x => x.saleId == saleId).ToList();
                 salesData[saleId] =  sale;
             }
-
-            return salesData;
-        }
+           
+           }
+           catch(Exception e)
+           {
+              return null;
+           }
+ }
 
 
 
         private async Task<List<SalesDto>> GetAllSalesMaster()
         {
+            try
+            {
             DataTable salesReader = await GetAllSalesMasterDatatable();
             if (salesReader == null || salesReader.Rows.Count == 0)
                 return null;
 
-            try
-            {
+            
                 List<SalesDto> salesMaster = new();
                 foreach (DataRow row in salesReader.Rows)
                 {
@@ -62,12 +69,12 @@ namespace POSGresApi.Services
 
         private async Task<List<SalesDetailDto>> GetAllSalesDetail()
         {
+           try {
             DataTable salesReader = await GetAllSalesDetailDatatable();
             if (salesReader == null || salesReader.Rows.Count == 0)
                 return null;
 
-            try
-            {
+           
                 List<SalesDetailDto> salesDetail = new();
                 foreach (DataRow row in salesReader.Rows)
                 {
