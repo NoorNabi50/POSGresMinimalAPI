@@ -10,7 +10,7 @@ namespace POSGresApi.Services
     {
 
         private StringBuilder query { get; set; }
-        private NpgsqlCommand npgsqlCommand { get; set; }
+        private NpgsqlCommand npgsqlCommand { get; set; } = new NpgsqlCommand();
 
 
         public async Task<Dictionary<int,SalesDto>> GetAllSales()
@@ -23,7 +23,7 @@ namespace POSGresApi.Services
                 return null;
 
             var salesDetail = await GetAllSalesDetail();
-            Dictionary<int, SalesDto> salesData = new();
+            Dictionary<int, SalesDto> salesData = new();             
             foreach(var sale in sales)
             {
                 int saleId = sale.saleId;
@@ -94,7 +94,6 @@ namespace POSGresApi.Services
         private async Task<DataTable> GetAllSalesMasterDatatable()
         {
             query = new StringBuilder();
-            npgsqlCommand = new NpgsqlCommand();
             query.Append("SELECT saleid,transactionDate,customerName,status,canDelete,canModify from Sales");
             npgsqlCommand.CommandText = query.ToString();
             return await new DatabaseUtility().GetData(npgsqlCommand);
@@ -104,7 +103,6 @@ namespace POSGresApi.Services
         private async Task<DataTable> GetAllSalesDetailDatatable()
         {
             query = new StringBuilder();
-            npgsqlCommand = new NpgsqlCommand();
             query.Append("SELECT * from SalesDetail");
             npgsqlCommand.CommandText = query.ToString();
             return await new DatabaseUtility().GetData(npgsqlCommand);
