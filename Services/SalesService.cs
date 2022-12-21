@@ -39,12 +39,25 @@ namespace POSGresApi.Services
  }
 
 
+        public async Task<SalesDto> GetSalesById(int Id=0)
+        {
+            try {
+              DataRow row = await GetAllSalesMaster("\n where saleid = @saleId ");
+            }
+
+            catch(Exception e)
+            {
+              return null;
+            }
+
+        }
+
 
         private async Task<List<SalesDto>> GetAllSalesMaster()
         {
             try
             {
-            DataTable salesReader = await GetAllSalesMasterDatatable();
+            DataTable salesReader = await GetSalesMasterDatatable();
             if (salesReader == null || salesReader.Rows.Count == 0)
                 return null;
 
@@ -52,8 +65,7 @@ namespace POSGresApi.Services
                 List<SalesDto> salesMaster = new();
                 foreach (DataRow row in salesReader.Rows)
                 {
-                    SalesDto salesDto = new SalesDto { saleId =  (int)row["saleId"], transactionDate = (DateTime)row["transactionDate"], customerName = row["customerName"].ToString(),
-                                                    status = (int)row["status"], canDelete =  (bool)row["canDelete"], canModify =  (bool)row["canModified"]};
+                    SalesDto salesDto = MapDataRowToSaleDtoObject(row)
                     salesMaster.Add(salesDto);
                 }
                 return salesMaster;
@@ -70,7 +82,7 @@ namespace POSGresApi.Services
         private async Task<List<SalesDetailDto>> GetAllSalesDetail()
         {
            try {
-            DataTable salesReader = await GetAllSalesDetailDatatable();
+            DataTable salesReader = await GetSalesDetailDatatable();
             if (salesReader == null || salesReader.Rows.Count == 0)
                 return null;
 
@@ -78,9 +90,8 @@ namespace POSGresApi.Services
                 List<SalesDetailDto> salesDetail = new();
                 foreach (DataRow row in salesReader.Rows)
                 {
-                    SalesDetailDto salesDetailDto = new SalesDetailDto((int)row["detailId"], (int)row["saleId"], (int)row["ItemId"],
-                                                    (int)row["qty"], (decimal)row["price"], (decimal)row["discount"], (decimal)row["totalAmount"]);
-                    salesDetail.Add(salesDetailDto);
+                    SalesDetailDto salesDetailObject = MapDataRowToSalesDetailDtoObject(row);
+                    salesDetail.Add(salesDetailObject);
                 }
                 return salesDetail;
             }
@@ -91,20 +102,33 @@ namespace POSGresApi.Services
             }
         }
 
-        private async Task<DataTable> GetAllSalesMasterDatatable()
+        private async Task<DataTable> GetSalesMasterDatatable()
         {
-            query.Clear().Append("SELECT saleid,transactionDate,customerName,status,canDelete,canModify from Sales");
+            query.Clear().Append("SELECT saleid,transactionDate,customerName,status,canDelete,canModify FROM Sales");
             npgsqlCommand.CommandText = query.ToString();
             return await new DatabaseUtility().GetData(npgsqlCommand);
         }
 
 
-        private async Task<DataTable> GetAllSalesDetailDatatable()
+        private async Task<DataTable> GetSalesDetailDatatable()
         {
-            query.Clear().Append("SELECT * from SalesDetail");
+            query.Clear().Append("SELECT * FROM SalesDetail");
             npgsqlCommand.CommandText = query.ToString();
             return await new DatabaseUtility().GetData(npgsqlCommand);
         }
 
+      
+      private SalesDto MapDataRowToSaleDtoObject(DataRow row) 
+      {
+        return new SalesDto { saleId =  (int)row["saleId"], transactionDate = (DateTime)row["transactionDate"], customerName = row["customerName"].ToString(),
+                                                    status = (int)row["status"], canDelete =  (bool)row["canDelete"], canModify =  (bool)row["canModified"]};
+      }
+
+      private SalesDetailDto MapDataRowToSalesDetailDtoObject(DataRow row)
+      {
+         new SalesDetailDto((int)row["detailId"], (int)row["saleId"], (int)row["ItemId"],
+                                                        (int)row["qty"], (decimal)row["price"], (decimal)row["discount"], 
+                                                        (decimal)row["totalAmount"]);
+      }
     }
 }
