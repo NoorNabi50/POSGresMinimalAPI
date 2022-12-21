@@ -9,7 +9,7 @@ namespace POSGresApi.Services
     public sealed class SalesService
     {
 
-        private StringBuilder query { get; set; } = new StringBuilder();
+        private StringBuilder query { get; set; } = new StringBuilder(); 
         private NpgsqlCommand npgsqlCommand { get; set; } = new NpgsqlCommand();
 
 
@@ -93,7 +93,7 @@ namespace POSGresApi.Services
 
         private async Task<DataTable> GetAllSalesMasterDatatable()
         {
-            query.Append("SELECT saleid,transactionDate,customerName,status,canDelete,canModify from Sales");
+            query.Clear().Append("SELECT saleid,transactionDate,customerName,status,canDelete,canModify from Sales");
             npgsqlCommand.CommandText = query.ToString();
             return await new DatabaseUtility().GetData(npgsqlCommand);
         }
@@ -101,7 +101,7 @@ namespace POSGresApi.Services
 
         private async Task<DataTable> GetAllSalesDetailDatatable()
         {
-            query.Append("SELECT * from SalesDetail");
+            query.Clear().Append("SELECT * from SalesDetail");
             npgsqlCommand.CommandText = query.ToString();
             return await new DatabaseUtility().GetData(npgsqlCommand);
         }
