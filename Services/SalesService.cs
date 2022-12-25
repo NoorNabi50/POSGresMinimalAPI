@@ -6,94 +6,96 @@ using System.Text;
 
 namespace POSGresApi.Services
 {
-    public sealed class SalesService
+    public sealed class SalesService : ISalesService
     {
 
-        private StringBuilder query { get; set; } = new StringBuilder(); 
-        private NpgsqlCommand npgsqlCommand { get; set; } = new NpgsqlCommand();
-
-
-        public async Task<Dictionary<int,SalesDto>> GetAllSales()
-        {
-           try 
-           {
-            var sales =  await GetAllSalesMaster();
-
-            if (sales is null)
-                return null;
-
-            var salesDetail = await GetAllSalesDetail();
-            Dictionary<int, SalesDto> salesData = new();             
-            foreach(var sale in sales)
-            {
-                int saleId = sale.saleId;
-                sale.salesDetailDto = salesDetail.Where(x => x.saleId == saleId).ToList();
-                salesData[saleId] =  sale;
-            }
-           
-           }
-           catch(Exception e)
-           {
-              return null;
-           }
- }
-
-
-        public async Task<SalesDto> GetSalesById(int Id=0)
-        {
-            try {
-              DataRow row = await GetAllSalesMaster("\n where saleid = @saleId ");
-            }
-
-            catch(Exception e)
-            {
-              return null;
-            }
-
-        }
-
-
-        private async Task<List<SalesDto>> GetAllSalesMaster()
+        private StringBuilder query { get; set; } = new StringBuilder();
+        public async Task<Dictionary<int, SalesDto>> GetAllSales()
         {
             try
             {
-            DataTable salesReader = await GetSalesMasterDatatable();
-            if (salesReader == null || salesReader.Rows.Count == 0)
-                return null;
 
-            
-                List<SalesDto> salesMaster = new();
-                foreach (DataRow row in salesReader.Rows)
+                var sales = await GetAllMasterSales();
+
+                if (sales is null)
+                    return null;
+
+                var salesDetail = await GetAllSalesDetail();
+                Dictionary<int, SalesDto> salesData = new();
+                foreach (var sale in sales)
                 {
-                    SalesDto salesDto = MapDataRowToSaleDtoObject(row)
-                    salesMaster.Add(salesDto);
+                    int saleId = sale.saleId;
+                    sale.salesDetailDto = salesDetail.Where(x => x.saleId == saleId).ToList();
+                    salesData[saleId] = sale;
                 }
-                return salesMaster;
-            }
 
-            catch(Exception e)
+                return salesData;
+            }
+            catch (Exception e)
             {
                 return null;
             }
         }
 
 
-
-        private async Task<List<SalesDetailDto>> GetAllSalesDetail()
+        public async Task<SalesDto> GetSalesById(int Id = 0)
         {
-           try {
-            DataTable salesReader = await GetSalesDetailDatatable();
-            if (salesReader == null || salesReader.Rows.Count == 0)
+            try
+            {
+                SalesDto? salesDto = null;
+                query.Clear().Append("SELECT saleid,transactionDate,customerName,status FROM sales where saleid = @id");
+                await using (NpgsqlCommand command = new NpgsqlCommand(query.ToString(), await Connection.OpenConnection()))
+                {
+                    command.Parameters.AddWithValue("@id", Id);
+                    await using (NpgsqlDataReader salesReader = await command.ExecuteReaderAsync())
+                    {
+                        
+                        while (await salesReader.ReadAsync())
+                        {
+                            salesDto =  MapToSalesDtoObject(salesReader);
+                        }
+
+                        await salesReader.CloseAsync();
+
+                        if (salesDto is not null)
+                        {
+                            salesDto.salesDetailDto = await GetSalesDetailById(salesDto.saleId);
+                        }
+                    }
+                    return salesDto;
+                }
+            }
+
+            catch(Exception e)
+            {
+
                 return null;
 
-           
-                List<SalesDetailDto> salesDetail = new();
-                foreach (DataRow row in salesReader.Rows)
+            }
+        }
+
+
+        public async Task<List<SalesDetailDto>> GetSalesDetailById(int saleId = 0)
+        {
+            try
+            {
+                query.Clear().Append("SELECT * FROM SalesDetail where saleid = @id");
+                List<SalesDetailDto> salesDetail = null;
+                await using (NpgsqlCommand command = new NpgsqlCommand(query.ToString(), await Connection.OpenConnection()))
                 {
-                    SalesDetailDto salesDetailObject = MapDataRowToSalesDetailDtoObject(row);
-                    salesDetail.Add(salesDetailObject);
+                    salesDetail = new List<SalesDetailDto>();
+                    command.Parameters.AddWithValue("@id", saleId);
+                    await using (NpgsqlDataReader salesReader = await command.ExecuteReaderAsync())
+                        while (await salesReader.ReadAsync())
+                        {
+                            salesDetail.Add(MapToSalesDetailDtoObject(salesReader));
+
+                        }
+
+                    return salesDetail;
                 }
-                return salesDetail;
+
+
             }
 
             catch (Exception e)
@@ -102,33 +104,91 @@ namespace POSGresApi.Services
             }
         }
 
-        private async Task<DataTable> GetSalesMasterDatatable()
+
+
+
+
+
+        public async Task<List<SalesDto>> GetAllMasterSales()
         {
-            query.Clear().Append("SELECT saleid,transactionDate,customerName,status,canDelete,canModify FROM Sales");
-            npgsqlCommand.CommandText = query.ToString();
-            return await new DatabaseUtility().GetData(npgsqlCommand);
+            try
+            {
+                query.Clear().Append("SELECT saleid,transactionDate,customerName,status FROM sales where saleid = 99");
+                List<SalesDto> salesMaster = new();
+                await using (NpgsqlCommand command = new NpgsqlCommand(query.ToString(), await Connection.OpenConnection()))
+                {
+                    await using (NpgsqlDataReader salesReader = await command.ExecuteReaderAsync())
+                    {
+                        while (await salesReader.ReadAsync())
+                        {
+                            salesMaster.Add(MapToSalesDtoObject(salesReader));
+                        }
+
+                       await salesReader.CloseAsync();
+                    }
+                    return salesMaster;
+                }
+            }
+
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
 
-        private async Task<DataTable> GetSalesDetailDatatable()
+
+
+        public async Task<List<SalesDetailDto>> GetAllSalesDetail()
         {
-            query.Clear().Append("SELECT * FROM SalesDetail");
-            npgsqlCommand.CommandText = query.ToString();
-            return await new DatabaseUtility().GetData(npgsqlCommand);
+            try
+            {
+                query.Clear().Append("SELECT * FROM SalesDetail");
+                List<SalesDetailDto> salesDetail =null;
+                await using (NpgsqlCommand command = new NpgsqlCommand(query.ToString(), await Connection.OpenConnection()))
+                {
+                    salesDetail = new List<SalesDetailDto>();
+
+                    await using (NpgsqlDataReader salesReader = await command.ExecuteReaderAsync())
+                        while (await salesReader.ReadAsync())
+                        {
+                            salesDetail.Add(MapToSalesDetailDtoObject(salesReader));
+
+                        }
+
+                    return salesDetail;
+                }
+
+
+            }
+
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
-      
-      private SalesDto MapDataRowToSaleDtoObject(DataRow row) 
-      {
-        return new SalesDto { saleId =  (int)row["saleId"], transactionDate = (DateTime)row["transactionDate"], customerName = row["customerName"].ToString(),
-                                                    status = (int)row["status"], canDelete =  (bool)row["canDelete"], canModify =  (bool)row["canModified"]};
-      }
 
-      private SalesDetailDto MapDataRowToSalesDetailDtoObject(DataRow row)
-      {
-         new SalesDetailDto((int)row["detailId"], (int)row["saleId"], (int)row["ItemId"],
-                                                        (int)row["qty"], (decimal)row["price"], (decimal)row["discount"], 
-                                                        (decimal)row["totalAmount"]);
-      }
+
+        private SalesDto MapToSalesDtoObject(NpgsqlDataReader salesReader)
+        {
+
+            return new SalesDto
+            {
+                saleId = (int)salesReader["saleId"],
+                transactionDate = salesReader["transactionDate"].ToString(),
+                customerName = salesReader["customerName"].ToString(),
+                status = (int)salesReader["status"]
+            };
+           
+        }
+
+        private SalesDetailDto MapToSalesDetailDtoObject(NpgsqlDataReader salesReader)
+        {
+           return new SalesDetailDto((int)salesReader["detailId"], (int)salesReader["saleId"], (int)salesReader["ItemId"],
+                                                          (int)salesReader["qty"], (decimal)salesReader["price"], (decimal)salesReader["discount"],
+                                                          (decimal)salesReader["totalAmount"]);
+        }
+
     }
 }

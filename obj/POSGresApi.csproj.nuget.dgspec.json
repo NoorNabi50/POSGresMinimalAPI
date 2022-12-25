@@ -40,9 +40,21 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "ErazerBrecht.Swashbuckle.AspNetCore.SwaggerUI": {
+              "target": "Package",
+              "version": "[1.0.1, )"
+            },
             "Npgsql": {
               "target": "Package",
               "version": "[6.0.7, )"
+            },
+            "Swashbuckle.AspNetCore.Swagger": {
+              "target": "Package",
+              "version": "[6.4.0, )"
+            },
+            "Swashbuckle.AspNetCore.SwaggerGen": {
+              "target": "Package",
+              "version": "[6.4.0, )"
             }
           },
           "imports": [
