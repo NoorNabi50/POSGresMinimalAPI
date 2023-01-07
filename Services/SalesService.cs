@@ -113,7 +113,7 @@ namespace POSGresApi.Services
         {
             try
             {
-                query.Clear().Append("SELECT saleid,transactionDate,customerName,status FROM sales where saleid = 99");
+                query.Clear().Append("SELECT saleid,transactionDate,customerName,status FROM sales");
                 List<SalesDto> salesMaster = new();
                 await using (NpgsqlCommand command = new NpgsqlCommand(query.ToString(), await Connection.OpenConnection()))
                 {

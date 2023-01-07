@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using POSGresApi.Repository;
 using POSGresApi.Services;
 using POSGresApi.Settings;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -14,22 +15,37 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-app.MapGet("/api/sales", async ([FromServices] ISalesService service) => 
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if(context.Response.StatusCode == StatusCodes.Status404NotFound)
+    {
+        if (!context.isValidURL())
+        {
+            context.Response.ContentType = Text.Plain;
+            await context.Response.WriteAsync("No resoruce available on the requested url");
+        }
+    }
+});
+
+app.MapGet("/api/sales/", async ([FromServices] ISalesService service) => 
 {
     var response = await service.GetAllSales();
-    return response is null ? Results.NotFound(new { data = "No Records Found", status = 404 }) : Results.Ok(new {data = response, status=200});
+    return response is null ? Results.Ok(new { data = "No Records Found", status = 404 }) : Results.Ok(new {data = response, status=200});
 });
 
 app.MapGet("/api/sales/{id}", async ([FromServices] ISalesService service, int id) =>
 {
     var response = await service.GetSalesById(id);
-    return response is null ? Results.NotFound(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
+    return response is null ? Results.Ok(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
 });
 
 app.MapGet("/api/sales/salesDetail/{id}", async ([FromServices] ISalesService service,int id) =>
 {
     var response = await service.GetSalesDetailById(id);
-    return response is null ? Results.NotFound(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
+    return response is null ? Results.Ok(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
 });
 
 app.UseSwagger();
