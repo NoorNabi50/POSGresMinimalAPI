@@ -24,8 +24,6 @@ namespace POSGresApi.Settings
             {
                 Console.WriteLine("Exception in ConfigueEndPoints " + e.ToString);
             }
-
-
         }
     }
 }

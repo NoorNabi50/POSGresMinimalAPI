@@ -49,10 +49,10 @@ namespace POSGresApi.Services
                     command.Parameters.AddWithValue("@id", Id);
                     await using (NpgsqlDataReader salesReader = await command.ExecuteReaderAsync())
                     {
-                        
+
                         while (await salesReader.ReadAsync())
                         {
-                            salesDto =  MapToSalesDtoObject(salesReader);
+                            salesDto = MapToSalesDtoObject(salesReader);
                         }
 
                         await salesReader.CloseAsync();
@@ -66,7 +66,7 @@ namespace POSGresApi.Services
                 }
             }
 
-            catch(Exception e)
+            catch (Exception e)
             {
 
                 return null;
@@ -124,7 +124,7 @@ namespace POSGresApi.Services
                             salesMaster.Add(MapToSalesDtoObject(salesReader));
                         }
 
-                       await salesReader.CloseAsync();
+                        await salesReader.CloseAsync();
                     }
                     return salesMaster;
                 }
@@ -144,7 +144,7 @@ namespace POSGresApi.Services
             try
             {
                 query.Clear().Append("SELECT * FROM SalesDetail");
-                List<SalesDetailDto> salesDetail =null;
+                List<SalesDetailDto> salesDetail = null;
                 await using (NpgsqlCommand command = new NpgsqlCommand(query.ToString(), await Connection.OpenConnection()))
                 {
                     salesDetail = new List<SalesDetailDto>();
@@ -180,14 +180,14 @@ namespace POSGresApi.Services
                 customerName = salesReader["customerName"].ToString(),
                 status = (int)salesReader["status"]
             };
-           
+
         }
 
         private SalesDetailDto MapToSalesDetailDtoObject(NpgsqlDataReader salesReader)
         {
-           return new SalesDetailDto((int)salesReader["detailId"], (int)salesReader["saleId"], (int)salesReader["ItemId"],
-                                                          (int)salesReader["qty"], (decimal)salesReader["price"], (decimal)salesReader["discount"],
-                                                          (decimal)salesReader["totalAmount"]);
+            return new SalesDetailDto((int)salesReader["detailId"], (int)salesReader["saleId"], (int)salesReader["ItemId"],
+                                                           (int)salesReader["qty"], (decimal)salesReader["price"], (decimal)salesReader["discount"],
+                                                           (decimal)salesReader["totalAmount"]);
         }
 
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using POSGresApi.EndPoints;
 using POSGresApi.Repository;
@@ -7,7 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
-ConfigurationProperties.ConnectionString = builder.Configuration.GetConnectionString("Database");
+AppSettings.ConnectionString = builder.Configuration.GetConnectionString("Database");
 builder.Services.AddSingleton<ISalesService, SalesService>();
 
 builder.Services.AddSwaggerGen(c =>
@@ -16,22 +17,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
-app.Use(async (context, next) =>
-{
-    await next();
-
-    if(context.Response.StatusCode == StatusCodes.Status404NotFound)
-    {
-        if (!context.isValidURL())
-        {
-            context.Response.ContentType = Text.Plain;
-            await context.Response.WriteAsync("No resoruce available on the requested url");
-        }
-    }
-});
-
-
+app.ConfigureMiddleWare();
 app.ConfigureEndPoints();
 
 app.UseSwagger();

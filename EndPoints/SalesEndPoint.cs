@@ -11,19 +11,17 @@ namespace POSGresApi.EndPoints
             app.MapGet("/api/sales/", async ([FromServices] ISalesService service) =>
             {
                 var response = await service.GetAllSales();
-                return response is null ? Results.Ok(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
+                return response is null ? Results.Ok(new { data = "No Records Found", status = StatusCodes.Status204NoContent }) : Results.Ok(new { data = response, status = StatusCodes.Status200OK });
             });
-
             app.MapGet("/api/sales/{id}", async ([FromServices] ISalesService service, int id) =>
             {
                 var response = await service.GetSalesById(id);
-                return response is null ? Results.Ok(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
+                return response is null ? Results.Ok(new { data = "No Records Found", status = StatusCodes.Status204NoContent }) : Results.Ok(new { data = response, status = StatusCodes.Status200OK });
             });
-
             app.MapGet("/api/sales/salesDetail/{id}", async ([FromServices] ISalesService service, int id) =>
             {
                 var response = await service.GetSalesDetailById(id);
-                return response is null ? Results.Ok(new { data = "No Records Found", status = 404 }) : Results.Ok(new { data = response, status = 200 });
+                return response is null ? Results.Ok(new { data = "No Records Found", status = StatusCodes.Status204NoContent }) : Results.Ok(new { data = response, status = StatusCodes.Status200OK });
             });
         }
     }
