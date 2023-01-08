@@ -4,9 +4,9 @@ using POSGresApi.Repository;
 
 namespace POSGresApi.EndPoints
 {
-    public static class SalesEndPoint /*: IRegisterEndPoints*/
+    public class SalesEndPoint : IRegisterEndPoints
     {
-        public static void RegisterSalesEndPoints(this WebApplication app)
+        public void RegisterEndPoints(WebApplication app)
         {
             app.MapGet("/api/sales/", async ([FromServices] ISalesService service) =>
             {

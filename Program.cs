@@ -32,7 +32,7 @@ app.Use(async (context, next) =>
 });
 
 
-app.RegisterEndPoints();
+app.ConfigureEndPoints();
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
