@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using POSGresApi.EndPoints;
+using POSGresApi.Extensions;
 using POSGresApi.Repository;
 using POSGresApi.Services;
 using POSGresApi.Settings;
@@ -17,6 +18,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<RateLimiterExtension>();
 app.ConfigureMiddleWare();
 app.ConfigureEndPoints();
 
