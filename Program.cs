@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 AppSettings.ConnectionString = builder.Configuration.GetConnectionString("Database");
 builder.Services.AddSingleton<ISalesService, SalesService>();
-
+builder.Services.AddSingleton<RateLimiterExtension>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new () { Title = "POSGres Sales Minimal API", Version = "v1" });
