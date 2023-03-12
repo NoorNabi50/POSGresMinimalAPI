@@ -1,26 +1,43 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using POSGresApi.EndPoints;
-using POSGresApi.Extensions;
 using POSGresApi.Repository;
 using POSGresApi.Services;
 using POSGresApi.Settings;
-using static System.Net.Mime.MediaTypeNames;
+using POSGresApi.Extensions;
+using POSGresApi.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+AppSettings.SetAppSettings(configuration.GetConnectionString("Database"),configuration.GetSection("ApiKeyHeaderName").Value,
+    configuration.GetSection("ApiKey").Value
+ );
+
+
+#region Register All nuget package service here
+
 builder.Services.AddEndpointsApiExplorer();
-AppSettings.ConnectionString = builder.Configuration.GetConnectionString("Database");
-builder.Services.AddSingleton<ISalesService, SalesService>();
+#endregion
+
+#region Register All Services here to resolve Dependency Injection or middlware extension services
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ISalesService, SalesService>();
 builder.Services.AddSingleton<RateLimiterExtension>();
+
+
+#endregion
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new () { Title = "POSGres Sales Minimal API", Version = "v1" });
 });
 
 var app = builder.Build();
+
+#region Register All Middlwares Sequentially on HTTP Request PipleLine  (The order matters Alot Here)
+app.AuthenticateRequest();
 app.UseMiddleware<RateLimiterExtension>();
-app.ConfigureMiddleWare();
+app.ConfigureExceptionHanler();
 app.ConfigureEndPoints();
+
+#endregion 
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>

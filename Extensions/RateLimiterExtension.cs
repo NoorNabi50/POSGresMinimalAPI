@@ -4,9 +4,9 @@ namespace POSGresApi.Extensions
 {
     public class RateLimiterExtension : IMiddleware
     {
-        private ConcurrentDictionary<string, int>? tokensBucket { get; set; }
+        private ConcurrentDictionary<string, int> tokensBucket { get; set; }
 
-        private const int maxRequests = 4;
+        private const int maxRequests = 5 ;
         private Timer? timer { get; set; }
 
         public RateLimiterExtension()
@@ -15,14 +15,15 @@ namespace POSGresApi.Extensions
             timer = new Timer(clearTokenBucket, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
         }
 
-        public Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public Task InvokeAsync(HttpContext context, RequestDelegate _next)
         {
+
             if (isRequestNotAllowed(context))
             {
-                context.Response.WriteAsJsonAsync(new { date = "The no of requests have been exceeded , Plz try Again Later" });
+                context.Response.WriteAsJsonAsync(new { date = "The no of requests have been exceeded , Plz try Again Later", status = StatusCodes.Status429TooManyRequests });
                 return Task.CompletedTask;
             }
-            return next(context);
+            return _next(context);
         }
 
         private bool isRequestNotAllowed(HttpContext context)
@@ -32,11 +33,11 @@ namespace POSGresApi.Extensions
             return tokensBucket[requestIpKey] > maxRequests;
         }
 
-        private void clearTokenBucket(Object obj)
+        private void clearTokenBucket(object obj)
         {
             Console.WriteLine("Debug: ***********************************Going to clear Token Bucket************************************");
             tokensBucket.Clear();
-        } 
+        }
     }
 
 }
