@@ -6,7 +6,7 @@ namespace POSGresApi.Extensions
     public static class EndpointsExtension
     {
 
-        public static void ConfigureEndPoints(this WebApplication app)
+        public static void ConfigureEndPointsRegisterationMiddlware(this WebApplication app)
         {
             try
             {

@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using POSGresApi.Authentication.Services;
 using POSGresApi.Settings;
 using System.Collections.Concurrent;
 
-namespace POSGresApi.Authentication
+namespace POSGresApi.Middlewares
 {
     public static class APIKeyAuthenticationMiddleware
     {
@@ -14,15 +15,15 @@ namespace POSGresApi.Authentication
             {
                 appBuilder.Use(async (context, next) =>
                 {
-                string apiKey = context.Request.Headers[AppSettings.ApiKeyHeaderName];
-                var cache = context.RequestServices.GetService(typeof(IMemoryCache)) as IMemoryCache;
+                    string apiKey = context.Request.Headers[AppSettings.ApiKeyHeaderName];
+                    var cache = context.RequestServices.GetService(typeof(IMemoryCache)) as IMemoryCache;
                     if (!APIKeyAuthentication.isValidAPIKey(apiKey, cache))
                     {
                         await context.Response.WriteAsJsonAsync(new { data = "Unvalid Request", status = StatusCodes.Status400BadRequest });
                     }
                     else
                     {
-                       await next();
+                        await next();
 
                     }
                 });
@@ -31,8 +32,8 @@ namespace POSGresApi.Authentication
         }
 
         #endregion
-      
 
-        
+
+
     }
 }

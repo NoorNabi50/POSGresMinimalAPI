@@ -11,7 +11,8 @@ namespace POSGresApi
 
         public async static Task<NpgsqlConnection> OpenConnection()
         {
-            string? connectionString = ConfigurationProperties.ConnectionString;
+            string? connectionString = AppSettings.ConnectionString;
+
             if (isConnectionOpen(connection))
             {
                 return connection;

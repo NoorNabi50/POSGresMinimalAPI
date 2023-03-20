@@ -2,14 +2,14 @@
 
 namespace POSGresApi.Extensions
 {
-    public class RateLimiterExtension : IMiddleware
+    public class RateLimiterExtensionMiddleware : IMiddleware
     {
         private ConcurrentDictionary<string, int> tokensBucket { get; set; }
 
         private const int maxRequests = 5 ;
         private Timer? timer { get; set; }
 
-        public RateLimiterExtension()
+        public RateLimiterExtensionMiddleware()
         {
             tokensBucket = new ConcurrentDictionary<string, int>();
             timer = new Timer(clearTokenBucket, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
