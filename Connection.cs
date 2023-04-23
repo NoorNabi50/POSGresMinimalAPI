@@ -9,7 +9,7 @@ namespace POSGresApi
 
         private static NpgsqlConnection? connection { get; set; }
 
-        public async static Task<NpgsqlConnection> OpenConnection()
+        public static async Task<IDbConnection> GetConnection()
         {
             string? connectionString = AppSettings.ConnectionString;
 
@@ -19,7 +19,6 @@ namespace POSGresApi
             }
 
             connection = new NpgsqlConnection(connectionString);
-            await connection.OpenAsync();
             return connection;
         }
 

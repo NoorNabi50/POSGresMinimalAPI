@@ -6,11 +6,11 @@ using System.Text;
 
 namespace POSGresApi.Sales.Services
 {
-    public sealed class SalesService : ISalesService
+    public sealed class SalesService //: ISalesService
     {
 
-        private StringBuilder query { get; set; } = new StringBuilder();
-        public async Task<Dictionary<int, SalesDto>> GetAllSales()
+      /*  private StringBuilder query { get; set; } = new StringBuilder();
+        public async Task<Dictionary<int, SalesDto>> GetAllSalesBySingleDBRequest()
         {
             try
             {
@@ -104,11 +104,6 @@ namespace POSGresApi.Sales.Services
             }
         }
 
-
-
-
-
-
         public async Task<List<SalesDto>> GetAllMasterSales()
         {
             try
@@ -139,7 +134,34 @@ namespace POSGresApi.Sales.Services
 
 
 
-        public async Task<List<SalesDetailDto>> GetAllSalesDetail()
+    
+
+        private SalesDto MapToSalesDtoObject(NpgsqlDataReader salesReader)
+        {
+
+            return new SalesDto
+            {
+                saleId = (int)salesReader["saleId"],
+                transactionDate = (DateTime)salesReader["transactionDate"],
+                customerName = salesReader["customerName"].ToString(),
+                status = (int)salesReader["status"]
+            };
+
+        }
+
+        private SalesDetailDto MapToSalesDetailDtoObject(NpgsqlDataReader salesReader)
+        {
+            return new SalesDetailDto((int)salesReader["detailId"], (int)salesReader["saleId"], (int)salesReader["ItemId"],
+                                                           (int)salesReader["qty"], (decimal)salesReader["price"], (decimal)salesReader["discount"],
+                                                           (decimal)salesReader["totalAmount"]);
+        }
+
+        public Task<Dictionary<int, SalesDto>> GetAllSalesByTwoDBRequests()
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<List<SalesDetailDto>> GetAllSalesDetail()
         {
             try
             {
@@ -167,28 +189,6 @@ namespace POSGresApi.Sales.Services
                 return null;
             }
         }
-
-
-
-        private SalesDto MapToSalesDtoObject(NpgsqlDataReader salesReader)
-        {
-
-            return new SalesDto
-            {
-                saleId = (int)salesReader["saleId"],
-                transactionDate = salesReader["transactionDate"].ToString(),
-                customerName = salesReader["customerName"].ToString(),
-                status = (int)salesReader["status"]
-            };
-
-        }
-
-        private SalesDetailDto MapToSalesDetailDtoObject(NpgsqlDataReader salesReader)
-        {
-            return new SalesDetailDto((int)salesReader["detailId"], (int)salesReader["saleId"], (int)salesReader["ItemId"],
-                                                           (int)salesReader["qty"], (decimal)salesReader["price"], (decimal)salesReader["discount"],
-                                                           (decimal)salesReader["totalAmount"]);
-        }
-
+*/
     }
 }

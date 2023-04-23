@@ -3,7 +3,7 @@
     public static class ExceptionHandlingMiddleware
     {
 
-        public static void ConfigureExceptionHanler(this WebApplication app)
+        public static void ConfigureExceptionHandlingMiddlware(this WebApplication app)
         {
             app.Use(async (context, next) =>
             {
@@ -18,7 +18,7 @@
                 }
                 catch (Exception e)
                 {
-                    await context.Response.WriteAsJsonAsync(new { data = "The request is not in correct format", status = StatusCodes.Status400BadRequest });
+                    await context.Response.WriteAsJsonAsync(new { data = "Something went wrong while processing the request!", status = StatusCodes.Status500InternalServerError });
                 }
             });
 

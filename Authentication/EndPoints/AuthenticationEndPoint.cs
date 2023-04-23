@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using POSGresApi.Abstraction;
+using POSGresApi.Authentication.Abstraction;
 using POSGresApi.Authentication.Services;
+using POSGresApi.Sales.Abstraction;
 
 namespace POSGresApi.Authentication.EndPoints
 {

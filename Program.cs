@@ -3,6 +3,8 @@ using POSGresApi.Extensions;
 using POSGresApi.Sales.Abstraction;
 using POSGresApi.Sales.Services;
 using POSGresApi.Middlewares;
+using POSGresApi.Authentication.Abstraction;
+using POSGresApi.Authentication.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -18,7 +20,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 #region Register All Services here to resolve Dependency Injection or middlware extension services
 builder.Services.AddMemoryCache();
-builder.Services.AddScoped<ISalesService, SalesService>();
+//builder.Services.AddScoped<ISalesService, SalesService>(provider => new SalesService());
+builder.Services.AddScoped<ISalesService, SalesServiceDapper>(provider => new SalesServiceDapper());
+builder.Services.AddScoped<IUserManagementService,UserManagementService>();
 builder.Services.AddSingleton<RateLimiterExtensionMiddleware>();
 
 
